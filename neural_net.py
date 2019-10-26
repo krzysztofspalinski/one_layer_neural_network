@@ -22,7 +22,7 @@ def loss_function(Y_hat, train_data):
     return loss
 
 
-def forward_propagation(X: np.ndarray, weights):
+def forward_propagation(X: np.ndarray, weights: dict):
     Z1 = np.dot(weights['W1'], X) + weights['b1']
     A1 = relu(Z1)
     Z2 = np.dot(weights['W2'], A1) + weights['b2']
@@ -73,7 +73,18 @@ def update_weights(weights, gradients, learning_rate):
     return weights
 
 
-def train_nn_binary_classifier(X, Y, n_h, learning_rate, iterations):
+def train_nn_binary_classifier(X: np.ndarray, Y: np.ndarray, n_h: int, learning_rate: float, iterations: int):
+    """
+    Trains neural network based on input data.
+
+    :param X: 2d array of training data, samples should be stored in columns.
+    :param Y: row vector of training data classes (0 or 1).
+    :param n_h: number of neurons in hidden layer.
+    :param learning_rate: learning rate used in gradient descent.
+    :param iterations: number of iterations of gradient descent.
+    :return: weights – a dictionary containing weights that can be used to predict using predict_nn_binary_classifier.
+    """
+
     train_data = {'X': X, 'Y': Y, 'm': X.shape[1], 'n_x': X.shape[0], 'n_h': n_h}
 
     weights = initialize_weights(train_data['n_x'], n_h)
@@ -102,14 +113,24 @@ def draw_loss(loss_on_iteration):
     plt.show()
 
 
-def predict_nn_binary_classifier(X, weights):
-    A2, cache = forward_propagation(X, weights)
-    return A2, cache
+def predict_nn_binary_classifier(X: np.ndarray, weights: dict):
+    """
+    Prediction function for neural network.
+
+    :param X: 2d array of data to predict, samples should be stored in columns.
+    :param weights: dictionary of weights for nerual network, output of train_nn_binary_classifier.
+    :return: Y_hat – row vector of probabilities that given sample belongs to class 1.
+    """
+    Y_hat, _ = forward_propagation(X, weights)
+    return Y_hat
 
 def normalize_data(X_train, X_test):
     """
-    Normilzes training and test set.
-    Samples should be in rows; X_* = [x_1, x_2, x_3,...]
+    Normalizes data, each feature is scaled to have mean 0 and variance 1, based on train data.
+
+    :param X_train: 2d array of training data, samples should be stored in columns.
+    :param X_test: 2d array of test data, samples should be stored in columns.
+    :return: X_train, X_test; normalized arrays
     """
     mi = np.mean(X_train, axis=1, keepdims=True)
     sigma = np.sqrt(np.mean(X_train**2, axis=1, keepdims=True))
